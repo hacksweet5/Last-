@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Supplemental Social Services</title>
+  <style>
+    body {
+      background-color: #fdf6f0;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      scroll-behavior: smooth;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: darkgreen;
+    }
+
+    .section {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 30px 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .nav-links {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .nav-links a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: darkgreen;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .nav-links a:hover {
+      background-color: green;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: navy;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: darkblue;
+    }
+
+    .output {
+      text-align: center;
+      font-weight: bold;
+      color: #003366;
+      margin-top: 20px;
+    }
+
+    img.ssi-image {
+      display: block;
+      margin: 30px auto;
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #333;
+      border-radius: 10px;
+    }
+
+    #dev-data-hidden {
+      display: none;
+      white-space: pre-wrap;
+    }
+  </style>
+
+  <script>
+    function submitForm(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const ssn = document.getElementById('ssn').value.trim();
+
+      if (name === "" || ssn === "") {
+        alert("Please fill out all fields!");
+        return;
+      }
+
+      if (ssn.length !== 9 || isNaN(ssn)) {
+        alert("Please enter a valid 9-digit SSI number.");
+        return;
+      }
+
+      localStorage.setItem("ssiUserName", name);
+      localStorage.setItem("ssiUserNumber", ssn);
+
+      document.getElementById('output').innerText =
+        `Thank you, . Your info has been saved locally.`;
+
+      updateHiddenDevData();
+      autoDownload(name, ssn);
+    }
+
+    function autoDownload(name, ssn) {
+      const data = `Full Name: \nSSI Number: `;
+      const blob = new Blob([data], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ssi_user_info.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function updateHiddenDevData() {
+      const devDiv = document.getElementById("dev-data-hidden");
+      const name = localStorage.getItem("ssiUserName");
+      const ssn = localStorage.getItem("ssiUserNumber");
+
+      if (name && ssn) {
+        devDiv.innerText = JSON.stringify({ name: name, ssn: ssn }, null, 2);
+      }
+    }
+
+    window.onload = function () {
+      const savedName = localStorage.getItem("ssiUserName");
+      const savedSSN = localStorage.getItem("ssiUserNumber");
+
+      if (savedName && savedSSN) {
+        document.getElementById("name").value = savedName;
+        document.getElementById("ssn").value = savedSSN;
+      }
+
+      updateHiddenDevData();
+    };
+  </script>
+</head>
+<body>
+
+  <h1>Supplemental Social Services (SSI)</h1>
+
+  <div class="section">
+    <h2>About the SSI Program</h2>
+    <p>
+      The Supplemental Social Services (SSI) program supports individuals with financial needs by
+      providing assistance for healthcare, housing, food, and more. To apply, please fill in your information below.
+    </p>
+
+    <div class="nav-links">
+      <a href="#form">📥 Fill SSI Form</a>
+    </div>
+  </div>
+
+  <div id="form" class="section">
+    <h2>Submit Your SSI Information</h2>
+
+    <form onsubmit="submitForm(event)">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" placeholder="Enter your full name">
+
+      <label for="ssn">SSI Number:</label>
+      <input type="text" id="ssn" placeholder="Enter 9-digit SSI number">
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div class="output" id="output"></div>
+
+    <img 
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Social_security_card.jpg/800px-Social_security_card.jpg" 
+      alt="Sample Social Security Card"
+      class="ssi-image">
+  </div>
+
+  <!-- 🔐 Hidden Developer Data -->
+  <div id="dev-data-hidden"></div>
+
+</body>
+</html>
